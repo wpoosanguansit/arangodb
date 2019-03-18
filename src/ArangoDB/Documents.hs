@@ -8,25 +8,6 @@ module ArangoDB.Documents (
   -- ** Create document
   createDocument,
 
--- $setup
--- >>> :set -XOverloadedStrings
--- >>> :set -XFlexibleInstances
--- >>> :set -XDeriveGeneric
--- >>> :set -XDeriveAnyClass
--- >>> :set -XScopedTypeVariables
--- >>> import Data.Aeson
--- >>> import GHC.Generics
--- >>> import Data.Either (isRight, isLeft)
--- >>> import Data.Aeson.WithField  (OnlyField (..))
--- >>> import ArangoDB.Collections
--- >>> data Person = Person { firstname :: String, lastname :: String } deriving (Show, Generic, ToJSON, FromJSON)
--- >>> user1 = Person "Nick" "K."
--- >>> user2 = Person "gang" "w."
--- >>> collectionName = "Person" :: TypedCollectionName Person
--- >>> createCollectionResult = runDefault $ createCollection "Person"
--- >>> fmap isRight createCollectionResult
--- True
-
   -- ** Update document
   updateDocument,
   updateDocument_,
@@ -54,6 +35,31 @@ import           Data.Aeson            (FromJSON, ToJSON)
 import           Data.Aeson.WithField  (OnlyField (..))
 import           Data.Proxy
 import           Servant.API
+import           ArangoDB.Types
+import           ArangoDB.Utils.Client
+import           Data.Aeson            (FromJSON, ToJSON)
+import           Data.Aeson.WithField  (OnlyField (..))
+import           Data.Proxy
+import           Servant.API
+
+-- $setup
+-- >>> :set -XOverloadedStrings
+-- >>> :set -XFlexibleInstances
+-- >>> :set -XDeriveGeneric
+-- >>> :set -XDeriveAnyClass
+-- >>> :set -XScopedTypeVariables
+-- >>> import Data.Aeson
+-- >>> import GHC.Generics
+-- >>> import Data.Either (isRight, isLeft)
+-- >>> import Data.Aeson.WithField  (OnlyField (..))
+-- >>> import ArangoDB.Collections
+-- >>> data Person = Person { firstname :: String, lastname :: String } deriving (Show, Generic, ToJSON, FromJSON)
+-- >>> user1 = Person "Nick" "K."
+-- >>> user2 = Person "gang" "w."
+-- >>> collectionName = "Person" :: TypedCollectionName Person
+-- >>> createCollectionResult = runDefault $ createCollection "Person"
+-- >>> fmap isRight createCollectionResult
+-- True
 
 getDocument :: forall a. FromJSON a => (TypedCollectionName a) -> DocumentKey -> ArangoClientM (Document a)
 getDocument = arangoClient (Proxy @(GetDocument a))
@@ -163,6 +169,7 @@ updateDocumentReturnOld typedCollectionName docKey waitForSync silent ifMatch do
 -- >>> Right (Document docId3 docKey3 docRev3 _) <- runDefault $ updateDocument collectionName (Just False)  docKey2  (Just False) (Just False) (Just docRev2) user2
 -- >>> dropResult1 = runDefault $ dropDocument collectionName (Just False)  docKey3  (Just False) (Just False) (Just docRev3) user2
 -- >>> fmap isRight dropResult1
+<<<<<<< HEAD
 -- True
 -- >>> Right (Document docId4 docKey4 docRev4 _) <- runDefault $ createDocument collectionName (Just False) (Just False) (Just False) user1
 -- >>> updateDocumentFullFunc = runDefault $ updateDocumentReturnOld collectionName  docKey4  (Just False) (Just False) (Just docRev4) user2
@@ -176,3 +183,18 @@ updateDocumentReturnOld typedCollectionName docKey waitForSync silent ifMatch do
 -- >>> dropCollectionFunc = runDefault $ dropCollection "Person"
 -- >>> fmap isRight dropCollectionFunc
 -- True
+=======
+-- True
+-- >>> Right (Document docId4 docKey4 docRev4 _) <- runDefault $ createDocument collectionName (Just False) (Just False) (Just False) user1
+-- >>> updateDocumentFullFunc = runDefault $ updateDocumentReturnOld collectionName  docKey4  (Just False) (Just False) (Just docRev4) user2
+-- >>> Right (Document docId5 docKey5 docRev5 docValue1) <- updateDocumentFullFunc
+-- >>> docValue1
+-- Person {firstname = "Nick", lastname = "K."}
+-- >>> Right (Document docId6 docKey6 docRev6 _) <- runDefault $ createDocument collectionName (Just False) (Just False) (Just False) user1
+-- >>> Right (Document docId7 docKey7 docRev7 docValue3) <- runDefault $ dropDocumentReturnOld collectionName docKey6  (Just False) (Just False) (Just docRev6) user1
+-- >>> docValue3
+-- Person {firstname = "Nick", lastname = "K."}
+-- >>> dropCollectionFunc = runDefault $ dropCollection "Person"
+-- >>> fmap isRight dropCollectionFunc
+-- True
+>>>>>>> 5d68989a158e94369bfba50708274cb23fd55542
