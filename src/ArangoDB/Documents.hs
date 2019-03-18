@@ -7,12 +7,6 @@ module ArangoDB.Documents (
 
   -- ** Create document
   createDocument,
-import           ArangoDB.Types
-import           ArangoDB.Utils.Client
-import           Data.Aeson            (FromJSON, ToJSON)
-import           Data.Aeson.WithField  (OnlyField (..))
-import           Data.Proxy
-import           Servant.API
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -54,6 +48,12 @@ import           Servant.API
 ) where
 
 import           ArangoDB.Internal.Documents
+import           ArangoDB.Types
+import           ArangoDB.Utils.Client
+import           Data.Aeson            (FromJSON, ToJSON)
+import           Data.Aeson.WithField  (OnlyField (..))
+import           Data.Proxy
+import           Servant.API
 
 getDocument :: forall a. FromJSON a => (TypedCollectionName a) -> DocumentKey -> ArangoClientM (Document a)
 getDocument = arangoClient (Proxy @(GetDocument a))
