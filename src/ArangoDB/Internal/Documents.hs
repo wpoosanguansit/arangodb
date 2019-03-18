@@ -19,11 +19,9 @@ import           Data.Aeson
 import           Data.Aeson.Unit
 import           Data.Aeson.WithField  (OnlyField (..))
 import qualified Data.HashMap.Strict   as HashMap
-import           Data.Monoid
 import           Data.Proxy
 import           Data.String           (IsString)
-import           Data.Text             (Text)
-import qualified Data.Text             as Text
+import           Data.Text             (Text, splitOn)
 
 import           Servant.API
 
@@ -270,6 +268,6 @@ instance FromJSON a => FromJSON (Document a) where
 newtype TypedCollectionName a = TypedCollectionName Text deriving newtype (IsString, Eq, Show, ToHttpApiData, ToJSON, FromJSON)
 
 splitDocumentId :: DocumentId a -> (TypedCollectionName a, DocumentKey)
-splitDocumentId (DocumentId handle) = case Text.splitOn "/" handle of
+splitDocumentId (DocumentId handle) = case splitOn "/" handle of
   [name, key] -> (TypedCollectionName name, DocumentKey key)
   _ -> error ("Impossible happened! Invalid document id: " ++ show handle)

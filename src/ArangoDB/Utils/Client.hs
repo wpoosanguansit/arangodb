@@ -2,6 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE RecordWildCards            #-}
+
 module ArangoDB.Utils.Client where
 
 import           Control.Monad.Reader
@@ -15,7 +16,6 @@ import           Servant.API.BasicAuth
 import           Servant.Client
 import           Servant.Client.Core
 import           Text.Show.Pretty      (pPrint)
-
 import           ArangoDB.Utils.Aeson  (pPrintJSON)
 
 data ArangoClientConfig = ArangoClientConfig
@@ -62,7 +62,7 @@ arangoClientEnv config = ClientEnv
   <*> pure Nothing
 
 -- | Run ArangoDB HTTP API requests for a given ArangoDB server.
-runArangoClientM :: ArangoClientConfig -> ArangoClientM a -> IO (Either ServantError a)
+runArangoClientM :: ArangoClientConfig -> ArangoClientM a -> IO (Either ClientError a)
 runArangoClientM config m = do
   env <- arangoClientEnv config
   runClientM (coerce m (arangoAuth config)) env
@@ -70,7 +70,7 @@ runArangoClientM config m = do
 arangoClient :: (HasClient ArangoClientM api) => Proxy api -> Client ArangoClientM api
 arangoClient api = api `clientIn` (Proxy :: Proxy ArangoClientM)
 
-runDefault :: ArangoClientM a -> IO (Either ServantError a)
+runDefault :: ArangoClientM a -> IO (Either ClientError a)
 runDefault = runArangoClientM defaultArangoClientConfig
 
 runDefault_ :: ArangoClientM a -> IO ()
@@ -94,6 +94,7 @@ type ArangoClientM = ArangoClientT ClientM
 instance RunClient m => RunClient (ArangoClientT m) where
   runRequest req = ArangoClientT $ ReaderT $ \mauth ->
     runRequest $ maybe id basicAuthReq mauth $ req
-  throwServantError = ArangoClientT . ReaderT . const . throwServantError
-  streamingRequest req = ArangoClientT $ ReaderT $ \mauth ->
-    streamingRequest $ maybe id basicAuthReq mauth $ req
+  throwClientError = ArangoClientT . ReaderT . const . throwClientError
+
+instance RunStreamingClient m => RunStreamingClient (ArangoClientT m) where
+  withStreamingRequest req f = ArangoClientT $ ReaderT $ \_ -> withStreamingRequest req f

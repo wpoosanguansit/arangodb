@@ -1,5 +1,8 @@
-resolver: lts-12.10
+resolver: lts-13.6
 packages:
 - .
 extra-deps:
 - aeson-injector-1.1.1.0
+- servant-client-0.16
+- servant-client-core-0.16
+allow-newer: true
