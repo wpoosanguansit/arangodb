@@ -97,4 +97,6 @@ instance RunClient m => RunClient (ArangoClientT m) where
   throwClientError = ArangoClientT . ReaderT . const . throwClientError
 
 instance RunStreamingClient m => RunStreamingClient (ArangoClientT m) where
-  withStreamingRequest req f = ArangoClientT $ ReaderT $ \_ -> withStreamingRequest req f
+  withStreamingRequest req f = ArangoClientT $ ReaderT $ \mauth -> 
+    let tmpReq = maybe id basicAuthReq mauth $ req
+    in withStreamingRequest tmpReq f
